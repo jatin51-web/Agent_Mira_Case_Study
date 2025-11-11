@@ -47,6 +47,6 @@ echo ""
 echo "Press CTRL+C to stop the server"
 echo ""
 
-# Start the server
+# Start the server (development mode)
 uvicorn main:app --reload --host 127.0.0.1 --port 8000
 
