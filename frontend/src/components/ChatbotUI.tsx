@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import PropertyCard from './PropertyCard';
 import QuickFilters from './QuickFilters';
+import ConfirmModal from './ConfirmModal';
 import { sendMessage, saveProperty, getSavedProperties } from '../lib/api';
 import { useAuth } from '../contexts/AuthContext';
 import styles from '../styles/ChatbotUI.module.css';
@@ -31,21 +32,56 @@ interface Property {
 
 export default function ChatbotUI() {
   const { isAuthenticated } = useAuth();
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '1',
-      type: 'bot',
-      content: "👋 Hi! I'm Mira, your AI real estate assistant. How can I help you find your dream home today?",
-      timestamp: new Date(),
-    },
-  ]);
+  
+  // Load messages from localStorage or use default welcome message
+  const getInitialMessages = (): Message[] => {
+    if (typeof window === 'undefined') return [];
+    
+    try {
+      const savedMessages = localStorage.getItem('chatMessages');
+      if (savedMessages) {
+        const parsed = JSON.parse(savedMessages);
+        // Convert timestamp strings back to Date objects
+        return parsed.map((msg: any) => ({
+          ...msg,
+          timestamp: new Date(msg.timestamp),
+        }));
+      }
+    } catch (error) {
+      console.error('Error loading messages from localStorage:', error);
+    }
+    
+    // Return default welcome message
+    return [
+      {
+        id: '1',
+        type: 'bot',
+        content: "👋 Hi! I'm Mira, your AI real estate assistant. How can I help you find your dream home today?",
+        timestamp: new Date(),
+      },
+    ];
+  };
+  
+  const [messages, setMessages] = useState<Message[]>(getInitialMessages);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState<string | null>(null);
   const [savedPropertyIds, setSavedPropertyIds] = useState<Set<string>>(new Set());
   const [showFilters, setShowFilters] = useState(false);
+  const [showClearModal, setShowClearModal] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  // Save messages to localStorage whenever they change
+  useEffect(() => {
+    if (typeof window !== 'undefined' && messages.length > 0) {
+      try {
+        localStorage.setItem('chatMessages', JSON.stringify(messages));
+      } catch (error) {
+        console.error('Error saving messages to localStorage:', error);
+      }
+    }
+  }, [messages]);
 
   // Load saved properties on mount
   useEffect(() => {
@@ -58,7 +94,7 @@ export default function ChatbotUI() {
     try {
       const response = await getSavedProperties();
       const savedProps = response.data.saved_properties || [];
-      const savedIds = new Set(savedProps.map((p: Property) => p.id));
+      const savedIds = new Set<string>(savedProps.map((p: Property) => p.id));
       setSavedPropertyIds(savedIds);
     } catch (error) {
       console.error('Error loading saved properties:', error);
@@ -258,21 +294,41 @@ export default function ChatbotUI() {
     }
   };
 
+  const clearChat = () => {
+    setShowClearModal(true);
+  };
+
+  const handleConfirmClear = () => {
+    const welcomeMessage: Message = {
+      id: '1',
+      type: 'bot',
+      content: "👋 Hi! I'm Mira, your AI real estate assistant. How can I help you find your dream home today?",
+      timestamp: new Date(),
+    };
+    setMessages([welcomeMessage]);
+    localStorage.removeItem('chatMessages');
+    setShowClearModal(false);
+  };
+
+  const handleCancelClear = () => {
+    setShowClearModal(false);
+  };
+
   return (
     <div className={styles.chatbotContainer}>
       <div className={styles.messagesContainer}>
         {messages.map((message) => (
-          <div key={message.id}>
+          <div key={message.id} className={styles.messageGroup}>
             {message.content && (
               <div className={`${styles.message} ${styles[message.type]}`}>
                 <div className={styles.messageContent}>
                   {message.content}
+                  {message.filters && (
+                    <div className={styles.filtersTag}>
+                      📍 {message.filters.location || 'Any'} • 💰 {message.filters.budget || 'Any'} • 🛏️ {message.filters.bedrooms || 'Any'} beds
+                    </div>
+                  )}
                 </div>
-                {message.filters && (
-                  <div className={styles.filtersTag}>
-                    📍 {message.filters.location || 'Any'} • 💰 {message.filters.budget || 'Any'} • 🛏️ {message.filters.bedrooms || 'Any'} beds
-                  </div>
-                )}
               </div>
             )}
             {message.properties && message.properties.length > 0 && (
@@ -294,12 +350,14 @@ export default function ChatbotUI() {
         ))}
 
         {isLoading && (
-          <div className={`${styles.message} ${styles.bot}`}>
-            <div className={styles.messageContent}>
-              <div className={styles.typingIndicator}>
-                <span></span>
-                <span></span>
-                <span></span>
+          <div className={styles.messageGroup}>
+            <div className={`${styles.message} ${styles.bot}`}>
+              <div className={styles.messageContent}>
+                <div className={styles.typingIndicator}>
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
               </div>
             </div>
           </div>
@@ -321,6 +379,13 @@ export default function ChatbotUI() {
           title="Quick Filters"
         >
           ⚙️
+        </button>
+        <button
+          className={styles.clearButton}
+          onClick={clearChat}
+          title="Clear Chat History"
+        >
+          🗑️
         </button>
         <form onSubmit={handleSendMessage} className={styles.inputForm}>
           <textarea
@@ -345,6 +410,17 @@ export default function ChatbotUI() {
           </button>
         </form>
       </div>
+
+      <ConfirmModal
+        isOpen={showClearModal}
+        title="Clear Chat History"
+        message="Are you sure you want to delete all chat messages? This action cannot be undone."
+        confirmText="Clear Chat"
+        cancelText="Cancel"
+        onConfirm={handleConfirmClear}
+        onCancel={handleCancelClear}
+        type="danger"
+      />
     </div>
   );
 }

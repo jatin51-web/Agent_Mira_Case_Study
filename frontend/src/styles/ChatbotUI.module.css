@@ -23,10 +23,10 @@
 .messagesContainer {
   flex: 1;
   overflow-y: auto;
-  padding: 2rem 1.5rem;
+  padding: 2rem 0;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1rem;
   position: relative;
   z-index: 1;
   scrollbar-width: thin;
@@ -50,17 +50,63 @@
   background: rgba(120, 119, 198, 0.7);
 }
 
+.messageGroup {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0.5rem;
+}
+
 .message {
   display: flex;
-  margin-bottom: 0.5rem;
+  gap: 0.75rem;
+  margin-bottom: 0;
   animation: fadeInUp 0.3s ease-out;
-  max-width: 85%;
-  align-self: flex-start;
+  padding: 0 2rem;
+  max-width: 100%;
+}
+
+.message.bot {
+  align-items: flex-start;
 }
 
 .message.user {
-  align-self: flex-end;
+  align-items: flex-start;
   flex-direction: row-reverse;
+  padding-right: 2rem;
+}
+
+.message::before {
+  content: '';
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  background-size: cover;
+  background-position: center;
+}
+
+.message.bot::before {
+  content: '🏠';
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+}
+
+.message.user::before {
+  content: '👤';
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
 }
 
 @keyframes fadeInUp {
@@ -75,20 +121,21 @@
 }
 
 .messageContent {
-  padding: 1rem 1.25rem;
-  border-radius: 18px;
+  padding: 0.875rem 1.125rem;
+  border-radius: 16px;
   font-size: 0.95rem;
   line-height: 1.6;
   word-wrap: break-word;
   position: relative;
   backdrop-filter: blur(10px);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+  max-width: 600px;
 }
 
 .message.bot .messageContent {
   background: rgba(255, 255, 255, 0.1);
   color: #e0e0e0;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-top-left-radius: 4px;
 }
 
@@ -96,6 +143,7 @@
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border-top-right-radius: 4px;
+  margin-left: auto;
 }
 
 .filtersTag {
@@ -142,30 +190,37 @@
 }
 
 .propertiesContainer {
-  margin: 1rem 0;
+  margin: 0.5rem 0 0 0;
+  padding: 0 2rem 0 4.75rem;
   animation: fadeInUp 0.4s ease-out;
+}
+
+.message.user + .propertiesContainer {
+  padding: 0 4.75rem 0 2rem;
 }
 
 .propertiesGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1.5rem;
-  margin-top: 1rem;
+  gap: 1.25rem;
+  max-width: 900px;
 }
 
 .inputContainer {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
+  justify-content: center;
   gap: 0.75rem;
-  padding: 1.5rem;
-  background: rgba(15, 12, 41, 0.8);
+  padding: 1.5rem 2rem;
+  background: rgba(15, 12, 41, 0.95);
   backdrop-filter: blur(20px);
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
   position: relative;
   z-index: 10;
 }
 
-.filterButton {
+.filterButton,
+.clearButton {
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 12px;
@@ -187,6 +242,12 @@
   border-color: rgba(102, 126, 234, 0.5);
 }
 
+.clearButton:hover {
+  background: rgba(255, 82, 82, 0.2);
+  transform: scale(1.05);
+  border-color: rgba(255, 82, 82, 0.5);
+}
+
 .inputForm {
   flex: 1;
   display: flex;
@@ -197,6 +258,8 @@
   border-radius: 24px;
   padding: 0.75rem 1rem;
   transition: all 0.3s ease;
+  max-width: 900px;
+  margin: 0 auto;
 }
 
 .inputForm:focus-within {
@@ -284,16 +347,35 @@
   }
 
   .messagesContainer {
-    padding: 1.5rem 1rem;
+    padding: 1.5rem 0;
   }
 
   .message {
-    max-width: 90%;
+    padding: 0 1rem;
+  }
+
+  .message.user {
+    padding-right: 1rem;
+  }
+
+  .message::before {
+    width: 32px;
+    height: 32px;
+    font-size: 1rem;
   }
 
   .messageContent {
-    padding: 0.875rem 1rem;
+    padding: 0.75rem 1rem;
     font-size: 0.9rem;
+    max-width: 450px;
+  }
+
+  .propertiesContainer {
+    padding: 0 1rem 0 3.5rem;
+  }
+
+  .message.user + .propertiesContainer {
+    padding: 0 3.5rem 0 1rem;
   }
 
   .propertiesGrid {
@@ -302,7 +384,7 @@
   }
 
   .inputContainer {
-    padding: 1rem;
+    padding: 1rem 1.25rem;
   }
 
   .filtersOverlay {
@@ -314,14 +396,38 @@
 
 @media (max-width: 480px) {
   .message {
-    max-width: 95%;
+    padding: 0 0.75rem;
+  }
+
+  .message.user {
+    padding-right: 0.75rem;
+  }
+
+  .message::before {
+    width: 28px;
+    height: 28px;
+    font-size: 0.9rem;
+  }
+
+  .messageContent {
+    max-width: 100%;
+    padding: 0.625rem 0.875rem;
+  }
+
+  .propertiesContainer {
+    padding: 0 0.75rem 0 3rem;
+  }
+
+  .message.user + .propertiesContainer {
+    padding: 0 3rem 0 0.75rem;
   }
 
   .inputContainer {
-    padding: 0.75rem;
+    padding: 0.875rem 1rem;
   }
 
-  .filterButton {
+  .filterButton,
+  .clearButton {
     width: 40px;
     height: 40px;
     font-size: 1rem;
