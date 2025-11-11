@@ -3,7 +3,8 @@
 import { useState, useEffect, useRef } from 'react';
 import PropertyCard from './PropertyCard';
 import QuickFilters from './QuickFilters';
-import { sendMessage, saveProperty } from '../lib/api';
+import { sendMessage, saveProperty, getSavedProperties } from '../lib/api';
+import { useAuth } from '../contexts/AuthContext';
 import styles from '../styles/ChatbotUI.module.css';
 
 interface Message {
@@ -29,6 +30,7 @@ interface Property {
 }
 
 export default function ChatbotUI() {
+  const { isAuthenticated } = useAuth();
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -40,9 +42,28 @@ export default function ChatbotUI() {
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState<string | null>(null);
+  const [savedPropertyIds, setSavedPropertyIds] = useState<Set<string>>(new Set());
   const [showFilters, setShowFilters] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  // Load saved properties on mount
+  useEffect(() => {
+    if (isAuthenticated) {
+      loadSavedProperties();
+    }
+  }, [isAuthenticated]);
+
+  const loadSavedProperties = async () => {
+    try {
+      const response = await getSavedProperties();
+      const savedProps = response.data.saved_properties || [];
+      const savedIds = new Set(savedProps.map((p: Property) => p.id));
+      setSavedPropertyIds(savedIds);
+    } catch (error) {
+      console.error('Error loading saved properties:', error);
+    }
+  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -155,25 +176,73 @@ export default function ChatbotUI() {
       });
   };
 
-  const handleSave = async (propertyId: string) => {
+  const handleSave = async (propertyId: string, property?: Property) => {
+    // Check if already saved
+    if (savedPropertyIds.has(propertyId)) {
+      const message: Message = {
+        id: Date.now().toString(),
+        type: 'bot',
+        content: "ℹ️ This property is already saved!",
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, message]);
+      return;
+    }
+
     setIsSaving(propertyId);
     try {
-      const user_id = 'user_123';
-      await saveProperty({ user_id, property_id: propertyId });
+      // Find property data from messages if not provided
+      let propertyData = property;
+      if (!propertyData) {
+        for (const msg of messages) {
+          if (msg.properties) {
+            const foundProp = msg.properties.find(p => p.id === propertyId);
+            if (foundProp) {
+              propertyData = foundProp;
+              break;
+            }
+          }
+        }
+      }
+      
+      // Convert property to backend format (need to reconstruct from display format)
+      const backendPropertyData = propertyData ? {
+        id: propertyData.id,
+        title: propertyData.title,
+        price: propertyData.price, // This is already formatted, but backend will handle it
+        location: propertyData.location,
+        bedrooms: propertyData.bedrooms,
+        image_url: propertyData.image,
+        image: propertyData.image
+      } : undefined;
+      
+      const response = await saveProperty(propertyId, backendPropertyData);
+      
+      // Add to saved properties set immediately for better UX
+      setSavedPropertyIds(prev => new Set([...prev, propertyId]));
+      
+      // Reload saved properties to keep in sync with backend
+      await loadSavedProperties();
 
+      const responseData = response.data || {};
+      const isAlreadySaved = responseData.already_saved;
+      
       const successMessage: Message = {
         id: Date.now().toString(),
         type: 'bot',
-        content: "✅ Saved successfully!",
+        content: isAlreadySaved 
+          ? "ℹ️ Property is already saved!" 
+          : "✅ Property saved successfully! You can save multiple properties in this chat.",
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, successMessage]);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving property:', error);
+      const errorMsg = error.response?.data?.detail || 'Failed to save property';
       const errorMessage: Message = {
         id: Date.now().toString(),
         type: 'bot',
-        content: "❌ Failed to save property. Please try again.",
+        content: `❌ ${errorMsg}. Please try again.`,
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, errorMessage]);
@@ -215,6 +284,7 @@ export default function ChatbotUI() {
                       property={property}
                       onSave={handleSave}
                       isSaving={isSaving === property.id}
+                      isSaved={savedPropertyIds.has(property.id)}
                     />
                   ))}
                 </div>

@@ -43,26 +43,20 @@ class TokenData(BaseModel):
     email: Optional[str] = None
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    """Verify a password against a hash"""
+    """Verify a password against its bcrypt hash"""
     try:
-        # Truncate password to 72 bytes if needed (bcrypt limit)
-        password_bytes = plain_password.encode('utf-8')
-        if len(password_bytes) > 72:
-            password_bytes = password_bytes[:72]
-            plain_password = password_bytes.decode('utf-8', errors='ignore')
         return pwd_context.verify(plain_password, hashed_password)
     except Exception as e:
         print(f"Password verification error: {e}")
         return False
 
 def get_password_hash(password: str) -> str:
-    """Hash a password - handles bcrypt's 72-byte limit by truncating"""
-    # Bcrypt has a 72-byte limit, truncate if necessary
-    password_bytes = password.encode('utf-8')
-    if len(password_bytes) > 72:
-        password_bytes = password_bytes[:72]
-        password = password_bytes.decode('utf-8', errors='ignore')
-    return pwd_context.hash(password)
+    """Hash a password using bcrypt"""
+    try:
+        return pwd_context.hash(password)
+    except Exception as e:
+        print(f"Password hashing error: {e}")
+        raise
 
 def create_access_token(data: dict, expires_delta: Optional[datetime] = None):
     """Create a JWT access token"""

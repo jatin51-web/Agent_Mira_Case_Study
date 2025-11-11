@@ -1,47 +1,99 @@
 .container {
   min-height: calc(100vh - 80px);
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   padding: 2rem;
-  background: #fafafa;
+  background: #0f0c29;
+  background: linear-gradient(135deg, #0f0c29 0%, #1a1a2e 100%);
 }
 
 .content {
-  max-width: 600px;
+  max-width: 1200px;
+  width: 100%;
   text-align: center;
-  background: white;
+  background: rgba(30, 30, 30, 0.5);
   padding: 3rem;
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
 .title {
   font-size: 2rem;
-  font-weight: 600;
-  color: #1a1a1a;
+  font-weight: 700;
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   margin-bottom: 1rem;
 }
 
 .description {
   font-size: 1.1rem;
-  color: #666;
+  color: #a0a0a0;
   margin-bottom: 2rem;
+}
+
+.emptyState {
+  padding: 2rem;
+}
+
+.error {
+  background-color: rgba(229, 62, 62, 0.1);
+  color: #ff6b6b;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  margin-bottom: 1.25rem;
+  font-size: 0.875rem;
+  border-left: 4px solid #ff6b6b;
+  text-align: left;
+}
+
+.propertiesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
+  margin: 2rem 0;
+}
+
+.propertyWrapper {
+  position: relative;
+}
+
+.removeButton {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background: rgba(229, 62, 62, 0.2);
+  color: #ff6b6b;
+  border: 1px solid #ff6b6b;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: 100%;
+}
+
+.removeButton:hover {
+  background: rgba(229, 62, 62, 0.3);
+  transform: translateY(-2px);
 }
 
 .link {
   display: inline-block;
   padding: 0.75rem 1.5rem;
-  background: #0066cc;
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6);
   color: white;
   text-decoration: none;
   border-radius: 8px;
   font-weight: 500;
-  transition: background-color 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s;
+  margin-top: 2rem;
 }
 
 .link:hover {
-  background: #0052a3;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
 }
 
 @media (max-width: 600px) {

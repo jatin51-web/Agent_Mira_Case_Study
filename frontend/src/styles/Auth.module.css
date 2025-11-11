@@ -1,0 +1,124 @@
+.authContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: #0f0c29;
+  background: linear-gradient(135deg, #0f0c29 0%, #1a1a2e 100%);
+  padding: 20px;
+}
+
+.authBox {
+  background: rgba(30, 30, 30, 0.8);
+  backdrop-filter: blur(10px);
+  padding: 2.5rem;
+  border-radius: 12px;
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+.authBox h1 {
+  margin-bottom: 1.5rem;
+  color: #f0f0f0;
+  font-size: 1.875rem;
+  font-weight: 700;
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.authForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  gap: 0.5rem;
+}
+
+.formGroup label {
+  font-weight: 500;
+  color: #e0e0e0;
+  font-size: 0.875rem;
+}
+
+.input {
+  padding: 0.75rem 1rem;
+  border: 1px solid #333;
+  border-radius: 6px;
+  font-size: 0.9375rem;
+  background: rgba(20, 20, 20, 0.5);
+  color: #e0e0e0;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #8b5cf6;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+}
+
+.input::placeholder {
+  color: #666;
+}
+
+.button {
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  margin-top: 0.5rem;
+}
+
+.button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+}
+
+.button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.authFooter {
+  margin-top: 1.5rem;
+  color: #a0a0a0;
+  font-size: 0.9375rem;
+}
+
+.link {
+  color: #8b5cf6;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.link:hover {
+  color: #3b82f6;
+  text-decoration: underline;
+}
+
+.error {
+  background-color: rgba(229, 62, 62, 0.1);
+  color: #ff6b6b;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  margin-bottom: 1.25rem;
+  font-size: 0.875rem;
+  border-left: 4px solid #ff6b6b;
+  text-align: left;
+}

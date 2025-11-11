@@ -11,8 +11,10 @@ from models.user_model import (
 from core.config import settings
 from core.db import db
 
-# OAuth2 scheme for token authentication
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
+from fastapi.security import OAuth2PasswordBearer
+
+# ✅ FIXED
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 class AuthService:
     def __init__(self, db: AsyncIOMotorDatabase):
