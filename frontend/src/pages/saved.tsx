@@ -5,16 +5,8 @@ import { useRouter } from 'next/router';
 import { useAuth } from '../contexts/AuthContext';
 import PropertyCard from '../components/PropertyCard';
 import { getSavedProperties, unsaveProperty } from '../lib/api';
+import { Property } from '../types/property';
 import styles from '../styles/SavedPage.module.css';
-
-interface Property {
-  id: string;
-  title: string;
-  price: string | number;
-  location: string;
-  bedrooms: number;
-  image?: string;
-}
 
 export default function SavedPage() {
   const [savedProperties, setSavedProperties] = useState<Property[]>([]);

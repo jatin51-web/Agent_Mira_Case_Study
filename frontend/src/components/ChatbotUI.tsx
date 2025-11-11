@@ -6,29 +6,8 @@ import QuickFilters from './QuickFilters';
 import ConfirmModal from './ConfirmModal';
 import { sendMessage, saveProperty, getSavedProperties } from '../lib/api';
 import { useAuth } from '../contexts/AuthContext';
+import { Property, Message } from '../types/property';
 import styles from '../styles/ChatbotUI.module.css';
-
-interface Message {
-  id: string;
-  type: 'bot' | 'user';
-  content: string;
-  timestamp: Date;
-  filters?: {
-    location?: string;
-    budget?: string;
-    bedrooms?: string;
-  };
-  properties?: Property[];
-}
-
-interface Property {
-  id: string;
-  title: string;
-  price: string;
-  location: string;
-  bedrooms: number;
-  image?: string;
-}
 
 export default function ChatbotUI() {
   const { isAuthenticated } = useAuth();

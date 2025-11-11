@@ -1,15 +1,7 @@
 'use client';
 
+import { Property } from '../types/property';
 import styles from '../styles/PropertyCard.module.css';
-
-interface Property {
-  id: string;
-  title: string;
-  price: string;
-  location: string;
-  bedrooms: number;
-  image?: string;
-}
 
 interface PropertyCardProps {
   property: Property;
